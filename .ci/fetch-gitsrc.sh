@@ -32,6 +32,11 @@ for package in "${_VCS_PKG[@]}"; do
         fi
     done
 
+    # Account for packages that use makedeps in prepare() or pkgver()
+    if [[ "${#makedepends[@]}" -gt 0 ]]; then
+        pacman -Syu --noconfirm --needed --asdeps "${makedepends[@]}"
+    fi
+
     # Download and extract sources, skipping deps
     sudo -Eu nobody makepkg -do
 
@@ -46,7 +51,8 @@ for package in "${_VCS_PKG[@]}"; do
         echo "Package already up-to-date."
     fi
 
-    # Cleanup stuff left behind, like sources
+    # Cleanup stuff left behind, like sources or makedepends
     git reset --hard HEAD
     git clean -fd
+    pacman -Qtdq | pacman -Rns -
 done
