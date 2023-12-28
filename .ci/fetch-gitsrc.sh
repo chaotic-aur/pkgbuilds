@@ -19,21 +19,22 @@ for package in "${_VCS_PKG[@]}"; do
     printf "\nChecking %s...\n" "$package"
     pushd "$package" || echo "Failed to change into $package!"
 
-    # Get PKGBUILD's variables
-    # shellcheck source=/dev/null
-    source PKGBUILD
+    # Parse PKGBUILD's variables
+    _OLD_PKGVER=$(grep -oP '\spkgver\s=\s\K.*' .SRCINFO)
+    mapfile -t _SOURCES < <(grep -oP '\ssource\s=\s\K.*' .SRCINFO)
+    mapfile -t _MAKEDEPENDS <  <(grep -oP '\smakedepends\s=\s\K.*' .SRCINFO)
 
     # Abort mission if sources() contains a fixed commit
     for fragment in branch commit tag revision; do
-        if [[ "$sources" == *"$fragment"* ]]; then
-            echo "Can't update pkgver due to fixed $fragment, continuing."
+        if [[ "${_SOURCES[*]}" == *"#$fragment="* ]]; then
+            echo "Can't update pkgver due to fixed $fragment, skipping."
             continue
         fi
     done
 
     # Account for packages that use makedeps in prepare() or pkgver()
-    if [[ "${#makedepends[@]}" -gt 0 ]]; then
-        pacman -Syu --noconfirm --needed --asdeps "${makedepends[@]}"
+    if [[ "${#_MAKEDEPENDS[@]}" -gt 0 ]]; then
+        pacman -Syu --noconfirm --needed --asdeps "${_MAKEDEPENDS[@]}"
     fi
 
     # Download and extract sources, skipping deps
