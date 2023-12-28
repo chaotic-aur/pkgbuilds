@@ -20,6 +20,7 @@ function update_pkgbuild() {
 		git commit -m "chore(${_PKGNAME[$_COUNTER]}): $_CURRENT_VERSION -> $_LATEST_VERSION"
 
 		git push "$REPO_URL" HEAD:main # Env provided via GitLab CI
+		echo ""
 	else
 		echo "No changes detected, skipping!"
 	fi
@@ -36,7 +37,7 @@ for package in "${_PKGNAME[@]}"; do
 
 	# Get the latest tag from via AUR RPC endpoint, using a placeholder for git packages
 	if [[ ! "$package" == *"-git"* ]]; then
-		_LATEST_VERSION=$(curl -s "https://aur.archlinux.org/rpc/v5/info?arg%5B%5D=${_PKGNAME[$_COUNTER]}" | jq '.results.[0].Version' | sed 's/"//g')
+		_LATEST_VERSION=$(curl -s "https://aur.archlinux.org/rpc/v5/info?arg%5B%5D=${_PKGNAME[$_COUNTER]}" | jq -r '.results.[0].Version')
 	elif [[ -f "${_PKGNAME[$_COUNTER]}/.CI_CONFIG" ]] && grep -q "CI_IS_GIT_SOURCE=1" "${_PKGNAME[$_COUNTER]}/.CI_CONFIG"; then
 		_LATEST_VERSION="git-src"
 	else
@@ -47,10 +48,13 @@ for package in "${_PKGNAME[@]}"; do
 	_CURRENT_VERSION=$(echo "$(grep -oP '^pkgver=\K.*' "${_PKGNAME[$_COUNTER]}/PKGBUILD")"-"$(grep -oP '^pkgrel=\K.*' "${_PKGNAME[$_COUNTER]}/PKGBUILD")")
 
 	if [[ "$_LATEST_VERSION" == "$_CURRENT_VERSION" ]]; then
-		echo "${_PKGNAME[$_COUNTER]} is up to date"
+		printf "%s is up to date.\n\n" "${_PKGNAME[$_COUNTER]}"
+		((_COUNTER++))
 		continue
 	elif [[ "$_LATEST_VERSION" == "git-src" ]]; then
 		# Up-to-date pkgver is maintained by us via fetch-gitsrc, so no need to do anything here
+		printf "%s is managed by fetch-gitsrc, skipping.\n\n" "${_PKGNAME[$_COUNTER]}"
+		((_COUNTER++))
 		continue
 	elif [[ "$_LATEST_VERSION" != "$_CURRENT_VERSION" ]]; then
 		# Otherwise just push the version update to main
