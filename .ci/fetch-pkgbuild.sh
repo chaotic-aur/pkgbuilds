@@ -55,7 +55,7 @@ for package in "${_PKGNAME[@]}"; do
 		# If no review is required and the package is a git package, do nothing
 		# we generally just want to update the PKGBUILD in case its something like deps,
 		# functions or makedep changing. Up-to-date pkgver is maintained by us.
-		return 0
+		continue
 	elif [[ "$pkgver"-"$pkgrel" != "$_LATEST" ]]; then
 		# Otherwise just push the version update to main
 		_TMPDIR=$(mktemp -d)
