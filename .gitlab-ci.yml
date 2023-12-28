@@ -11,7 +11,7 @@ variables:
   REDIS_SSH_USER: package-deployer
   REPO_NAME: chaotic-aur
   REPO_PATH: /home/package-deployer/repo/x86_64
-  REPO_URL: $CI_SERVER_PROTOCOL://gitlab-ci-token:$ACCESS_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git
+  REPO_URL: https://$ACCESS_TOKEN@github.com/chaotic-aur/pkgbuilds.git
 
 check-lint:
   # Check the PKGBUILD and install files for common bash anti-patterns and issues
@@ -85,7 +85,7 @@ fetch-gitsrc:
   image: archlinux:latest
   script:
     - pacman -Syu --noconfirm base-devel bash curl git
-    - git clone https://github.com/chaotic-aur/pkgbuilds.git
+    - git clone https://$ACCESS_TOKEN@github.com/chaotic-aur/pkgbuilds.git
     - cd pkgbuilds
     - git config --global user.name "$GIT_AUTHOR_NAME"
     - git config --global user.email "$GIT_AUTHOR_EMAIL"
@@ -103,7 +103,7 @@ fetch-pkgbuilds:
   image: alpine:latest
   script:
     - apk add --no-cache --upgrade bash curl git jq shfmt sudo
-    - git clone https://github.com/chaotic-aur/pkgbuilds.git
+    - git clone https://$ACCESS_TOKEN@github.com/chaotic-aur/pkgbuilds.git
     - cd pkgbuilds
     - git config --global user.name "$GIT_AUTHOR_NAME"
     - git config --global user.email "$GIT_AUTHOR_EMAIL"
@@ -120,7 +120,7 @@ check-rebuilds:
   image: archlinux:latest
   script:
     - pacman -Syu --noconfirm git
-    - git clone https://github.com/chaotic-aur/pkgbuilds.git
+    - git clone https://$ACCESS_TOKEN@github.com/chaotic-aur/pkgbuilds.git
     - cd pkgbuilds
     - git config --global user.name "$GIT_AUTHOR_NAME"
     - git config --global user.email "$GIT_AUTHOR_EMAIL"
