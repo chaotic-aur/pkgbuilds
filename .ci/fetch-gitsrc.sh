@@ -10,10 +10,9 @@ mapfile -t _PACKAGES < <(find . -mindepth 1 -type d -prune | sed -e '/.\./d' -e 
 # This is required for makepkg
 # shellcheck source=/dev/null
 source /etc/makepkg.conf
-chown -R nobody:root "$CI_PROJECT_DIR"
+chown -R ci-user:root "$CI_PROJECT_DIR"
 
 # Get a list of all packages containing "-git"
-IFS=$'\n'
 mapfile -t _VCS_PKG < <(printf '%s\n' "${_PACKAGES[@]}" | sed '/-git/!d')
 
 for package in "${_VCS_PKG[@]}"; do
@@ -38,10 +37,10 @@ for package in "${_VCS_PKG[@]}"; do
     fi
 
     # Download and extract sources, skipping deps
-    sudo -Eu nobody makepkg -do
+    sudo -u ci-user -H makepkg -do
 
     # Run pkgver function of the sourced PKGBUILD
-    sudo -Eu nobody makepkg --printsrcinfo | tee .SRCINFO &>/dev/null
+    sudo -u ci-user -H makepkg --printsrcinfo | tee .SRCINFO &>/dev/null
 
     if ! git diff --exit-code --quiet; then
         git add PKGBUILD .SRCINFO
@@ -54,5 +53,5 @@ for package in "${_VCS_PKG[@]}"; do
     # Cleanup stuff left behind, like sources or makedepends
     git reset --hard HEAD
     git clean -fd
-    pacman -Qtdq | pacman -Rns -
+    pacman -Qtdq | pacman -Rns --noconfirm
 done
