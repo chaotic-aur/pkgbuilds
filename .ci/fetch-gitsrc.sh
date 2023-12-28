@@ -53,5 +53,5 @@ for package in "${_VCS_PKG[@]}"; do
     # Cleanup stuff left behind, like sources or makedepends
     git reset --hard HEAD
     git clean -fd
-    pacman -Qtdq | pacman -Rns --noconfirm
+    pacman -Qtdq | pacman -Rns --noconfirm - || echo "No orphans left behind."
 done
