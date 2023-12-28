@@ -143,7 +143,7 @@ schedule-package:
     - '[[ -z ${DEPLOY_KEY+x} ]] && echo "No deploy key available, backing off!" && exit 1'
     - echo "$DEPLOY_KEY" >/app/sshkey
     - chmod 400 /app/sshkey
-    - apk add --no-cache --upgrade bash git
+    - apk add --no-cache --upgrade bash git grep
     # Ensure we have an actual git history to work with
     - git clone https://$ACCESS_TOKEN@github.com/chaotic-aur/pkgbuilds.git
     - cd pkgbuilds
