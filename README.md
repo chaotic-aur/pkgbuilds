@@ -56,6 +56,18 @@ This tool is distributed as Docker containers and consists of a pair of manager 
 The manager is used by GitLab CI in the `schedule-package` job, scheduling packages by adding it to the build queue.
 The builder can be used by any machine capable of running the container. It will pick available jobs from our central Redis instance.
 
+## Options
+
+### .CI_CONFIG
+
+The `.CI_CONFIG` file inside each package directory contains additional flags to control the pipelines and build processes with.
+
+- `CI_IS_GIT_SOURCE`: By setting this to `1`, the `fetch-gitsrc` job will update `pkgver` of this package.
+  This is useful for packages which use `pkgver()` to set their version without being having `-git` or another VCS package suffix.
+- `CI_MANAGE_AUR`: By setting this variable to `1`, the CI will update the corresponding AUR repository at the end of a pipeline run if changes occurred.
+- `CI_PKGREL`: Controls package bumps for all packages which don't have `CI_MANAGE_AUR` set to `1`. It increases `pkgrel` by `0.1` for every +1 increase of this variable.
+- `CI_PKGBUILD_SOURCE`: *Not yet implemented* - once implemented, this is meant to replace the place to set PKGBUILD sources, currently happening via the `SOURCES` file.
+
 ## Development setup
 
 This repository features a NixOS flake, which may be used to set up the needed things like pre-commit hooks and checks, as well as needed utilities, automatically via [direnv](https://direnv.net/).
