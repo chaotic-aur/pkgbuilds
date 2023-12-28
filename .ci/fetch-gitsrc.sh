@@ -44,7 +44,7 @@ for package in "${_VCS_PKG[@]}"; do
 
     if ! git diff --exit-code --quiet; then
         git add PKGBUILD .SRCINFO
-        git commit -m "chore($package): git-version $pkgver [deploy $package]"
+        git commit -m "chore($package): git-version $pkgver [deploy $package]" # fixme: use new pkgver
         git push "$REPO_URL" HEAD:main || git pull --rebase && git push "$REPO_URL" HEAD:main # Env provided via GitLab CI
     else
         echo "Package already up-to-date."

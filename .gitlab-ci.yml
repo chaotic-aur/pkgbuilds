@@ -144,10 +144,17 @@ schedule-package:
     - echo "$DEPLOY_KEY" >/app/sshkey
     - chmod 400 /app/sshkey
     - apk add --no-cache --upgrade bash git
+    # Ensure we have an actual git history to work with
+    - git clone https://$ACCESS_TOKEN@github.com/chaotic-aur/pkgbuilds.git
+    - cd pkgbuilds
+    - git config --global user.name "$GIT_AUTHOR_NAME"
+    - git config --global user.email "$GIT_AUTHOR_EMAIL"
   script:
     # This script determines whether a relevant change occurred and if so, builds the package
     # this can be triggered by either a [deploy *] commit message or changes of PKGBUILD folders
     - bash .ci/schedule-package.sh
+  variables:
+    GIT_STRATEGY: none
   rules:
     - changes:
         - "*/PKGBUILD"
