@@ -42,7 +42,7 @@ for package in "${_VCS_PKG[@]}"; do
     # Run pkgver function of the sourced PKGBUILD
     sudo -u ci-user -H makepkg --printsrcinfo | tee .SRCINFO &>/dev/null
 
-    _NEW_PKGVER=$(grep -oP '\spkgver\s=\s\K.*' "$package/.SRCINFO")
+    _NEW_PKGVER=$(grep -oP '\spkgver\s=\s\K.*' .SRCINFO)
 
     if ! git diff --exit-code --quiet; then
         git add PKGBUILD .SRCINFO
