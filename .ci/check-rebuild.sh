@@ -40,7 +40,7 @@ determine-affected() {
             fi
         done
         for makedep in "${_MAKEDEPENDS[@]}"; do
-            if [[ "${KNOWN_REBUILD_PACKAGES[*]}" =~ [[:space:]]"$dep"[[:space:]] ]]; then
+            if [[ "${KNOWN_REBUILD_PACKAGES[*]}" =~ [[:space:]]"$makedep"[[:space:]] ]]; then
                 _AFFECTED+=("$package")
                 echo "Package $package is affected by library version bumps..."
             fi
@@ -49,7 +49,7 @@ determine-affected() {
 }
 
 bump-affected() {
-    if [[ "${#_AFFECTED[@]}" -eq 1 ]]; then
+    if [[ "${#_AFFECTED[@]}" -eq 0 ]]; then
         echo "No packages affected by library version bumps, skipping."
         return 0
     else
